@@ -117,21 +117,55 @@ ToolSearch("javascript_tool")      ← 4th call
 ToolSearch("chrome navigate screenshot find", 20)  ← loads ALL Chrome tools at once
 ```
 
-### Screenshot discipline
+### Screenshot discipline — HARD LIMIT
 
-Maximum 3 screenshots per task:
-1. After navigation — assess the page state
-2. After your batch of actions — verify changes landed
-3. Final state — confirm completion
+**3 screenshots maximum per task. No exceptions.**
 
-Use `find()` + refs to click elements. Never screenshot just to find coordinates.
+| Screenshot # | When | Purpose |
+|---|---|---|
+| 1 | After first navigation | Assess page state, plan actions |
+| 2 | After all actions complete | Verify result |
+| 3 | ONLY if screenshot 2 showed failure | Debug only |
 
-### Batch browser actions
+**Never screenshot to:**
+- Check if a click worked (infer it from the next action's result)
+- Find coordinates (use `find()` + refs instead)
+- Verify intermediate steps
 
-Use `computer_batch` (available in computer-use MCP) to combine sequences:
+**Inference rule:** If the action didn't error, assume it worked. Take the next action. Screenshot only at the end.
+
+### Batch browser actions — REQUIRED
+
+Use `computer_batch` for ALL sequences of 2+ browser actions:
 ```
-[click field] + [ctrl+a] + [type new value] + [click save]  = 1 round trip
+BAD:  left_click(button) → wait → screenshot → left_click(submit)   [3 round trips]
+GOOD: computer_batch([left_click(button), left_click(submit)])       [1 round trip]
 ```
+
+### GitHub web editor — Exact Pattern
+
+When creating files on GitHub via browser, use this EXACT sequence every time:
+
+```
+1. navigate("https://github.com/USER/REPO/new/BRANCH?filename=PATH%2FFILE.md")
+   → URL param pre-fills the filename — never type filename manually
+2. write_clipboard(file_content)
+3. left_click(editor_area at coordinate [784, 400])
+4. key("ctrl+v")
+   → If editor was empty and paste landed: proceed to step 5
+   → If paste failed (editor still shows placeholder): repeat steps 3-4 once only
+5. find("Commit changes button") → left_click(ref)
+6. find("Commit changes submit button in dialog") → left_click(ref)
+   → No screenshot needed — navigate to next task
+```
+
+**Total: 0 screenshots for a file commit. You know it worked when GitHub redirects.**
+
+### TodoWrite — 2 calls maximum
+
+- Call 1: At task start with ALL todos set to pending
+- Call 2: At task end marking everything completed
+- NEVER call TodoWrite mid-task to update individual items
 
 ---
 
