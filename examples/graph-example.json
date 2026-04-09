@@ -1,0 +1,60 @@
+{
+  "_comment": "Copy this to memory/graph.json and fill in your details",
+  "version": "1.0",
+  "updated": "TODAY",
+  "owner": "YOUR NAME",
+
+  "nodes": {
+    "user:primary": {
+      "type": "user",
+      "name": "Your Full Name",
+      "email": "you@example.com",
+      "github": "your-github-username",
+      "linkedin": "in/your-profile",
+      "location": "Your City, Country",
+      "role": "Your Role"
+    },
+
+    "repo:example-project": {
+      "type": "repo",
+      "name": "example-project",
+      "owner": "your-github-username",
+      "visibility": "public",
+      "lang": "Python",
+      "description": "What this repo does",
+      "topics": ["python", "your-topic"]
+    },
+
+    "service:github": {
+      "type": "service",
+      "name": "GitHub",
+      "username": "your-github-username",
+      "auth": "logged in via browser OR personal access token",
+      "api_base": "https://api.github.com"
+    },
+
+    "workflow:github-api": {
+      "type": "workflow",
+      "name": "GitHub API via curl",
+      "token_cost": 300,
+      "use_when": "Any GitHub data update (bio, repo description, README, topics)",
+      "steps": [
+        "curl -X PATCH https://api.github.com/user -H 'Authorization: token TOKEN' -d '{\"bio\":\"...\"}'",
+        "See references/workflows.md for full patterns"
+      ]
+    }
+  },
+
+  "edges": [
+    {"from": "user:primary", "to": "repo:example-project", "rel": "owns"},
+    {"from": "user:primary", "to": "service:github", "rel": "uses"}
+  ],
+
+  "session_log": [],
+
+  "hot_cache_nodes": [
+    "user:primary",
+    "service:github",
+    "workflow:github-api"
+  ]
+}
